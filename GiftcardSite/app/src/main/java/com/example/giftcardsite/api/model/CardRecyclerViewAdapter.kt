@@ -3,7 +3,9 @@ package com.example.giftcardsite.api.model
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -11,24 +13,31 @@ import com.example.giftcardsite.R
 import com.example.giftcardsite.UseCard
 import de.hdodenhof.circleimageview.CircleImageView
 
-class CardRecyclerViewAdapter(val context: Context, private val cardList: List<Card?>?, private val user: User?) : RecyclerView.Adapter<CardRecyclerViewAdapter.CardViewHolder>() {
+class CardRecyclerViewAdapter(
+    private val context: Context,
+    private val cardList: List<Card?>?,
+    private val user: User?
+) : RecyclerView.Adapter<CardRecyclerViewAdapter.CardViewHolder>() {
+
     inner class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun setData(card: Card?) {
-            val image : CircleImageView = itemView.findViewById(R.id.image_view)
-            val text : TextView = itemView.findViewById(R.id.name)
+            val image: CircleImageView = itemView.findViewById(R.id.image_view)
+            val text: TextView = itemView.findViewById(R.id.name)
+
             if (card != null) {
-                Glide.with(context).asBitmap().load("http://appsec.moyix.net/" + card.product?.productImageLink).into(image)
-            }
-            if (card != null) {
+                Glide.with(context)
+                    .asBitmap()
+                    .load("https://appsec.moyix.net/" + card.product?.productImageLink)
+                    .into(image)
+
                 text.text = card.amount.toString()
             }
 
             image.setOnClickListener {
                 if (card != null) {
-                    val localUser = user
-                    val intent = Intent(context, UseCard::class.java).apply{
-                        putExtra("User", localUser)
+                    val intent = Intent(context, UseCard::class.java).apply {
+                        putExtra("User", user)
                         putExtra("Card", card)
                     }
                     Log.d("Intent", "About to intent.")
@@ -38,7 +47,6 @@ class CardRecyclerViewAdapter(val context: Context, private val cardList: List<C
                 }
             }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -47,12 +55,10 @@ class CardRecyclerViewAdapter(val context: Context, private val cardList: List<C
     }
 
     override fun getItemCount(): Int {
-        if (cardList == null)
-            return 0
-        return cardList.size
+        return cardList?.size ?: 0
     }
 
-    override fun onBindViewHolder(holder: CardRecyclerViewAdapter.CardViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val card = cardList?.get(position)
         holder.setData(card)
     }
